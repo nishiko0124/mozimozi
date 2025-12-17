@@ -9,7 +9,7 @@ app = Flask(__name__)
 # ==========================================
 # 設定
 # ==========================================
-FONT_FILENAME = "NotoSansJP-Regular.ttf" 
+FONT_FILENAME = "NotoSansJP-VariableFont_wght.ttf" 
 IMG_SIZE = 512
 MAX_FONT_SIZE = 80 # 最大文字サイズ
 MIN_FONT_SIZE = 10 # これ以上は小さくしない

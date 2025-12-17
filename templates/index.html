@@ -2,19 +2,73 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>文字画像生成</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字画像ジェネレーター</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            text-align: center;
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 { margin-top: 0; font-size: 24px; }
+        input[type="text"] {
+            padding: 12px;
+            width: 70%;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+        }
+        input[type="text"]:focus { border-color: #007bff; }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background-color: #0056b3; }
+        .result-img {
+            margin-top: 30px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
 </head>
 <body>
-    <h1>画像生成アプリ</h1>
-    <form method="POST">
-        <input type="text" name="text" placeholder="文字を入力" value="{{ text }}">
-        <button type="submit">生成</button>
-    </form>
+    <div class="container">
+        <h1>文字画像メーカー</h1>
+        <p>好きな文字を入れてね</p>
+        
+        <form method="POST">
+            <input type="text" name="text" placeholder="ここに文字を入力..." value="{{ text }}" required>
+            <button type="submit">作成</button>
+        </form>
 
-    {% if img_url %}
-        <hr>
-        <h2>生成された画像:</h2>
-        <img src="{{ img_url }}" alt="Generated Image" style="border: 1px solid #ccc;">
-    {% endif %}
+        {% if img_url %}
+            <div>
+                <img src="{{ img_url }}" alt="生成された画像" class="result-img">
+                <br>
+                <a href="{{ img_url }}" download="image.png" style="display:inline-block; margin-top:10px; color:#007bff; text-decoration:none;">画像を保存する</a>
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>

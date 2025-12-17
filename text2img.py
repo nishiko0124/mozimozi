@@ -2,15 +2,28 @@ import os
 from flask import Flask, render_template, request, send_file
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
+from urllib.parse import quote
 
 app = Flask(__name__)
 
-# フォント設定（重要：クラウドやLinux環境ではMacのフォントパスは使えません）
-# 同じフォルダにフォントファイル(font.ttfなど)を置くのが一番確実です。
-# ここでは一旦、エラーにならないようにデフォルトフォントへのフォールバックを強化しています。
-FONT_PATH = "Hiragino Sans GB.ttc" # Mac用。Windowsなら "msgothic.ttc" など
+# ==========================================
+# 設定エリア
+# ==========================================
+# ここは実際に置いたフォントファイル名に合わせてね
+FONT_FILENAME = "NotoSansJP-VariableFont_wght.ttf" 
 IMG_SIZE = 512
 FONT_SIZE = 64
+TEXT_COLOR = (0, 0, 0)
+BG_COLOR = (255, 255, 255)
+
+def get_font():
+    """フォント読み込み（パス解決付き）"""
+    font_path = os.path.join(os.path.dirname(__file__), FONT_FILENAME)
+    try:
+        return ImageFont.truetype(font_path, FONT_SIZE)
+    except IOError:
+        print(f"警告: '{FONT_FILENAME}' が見つかりません。")
+        return ImageFont.load_default()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -19,43 +32,32 @@ def index():
     if request.method == 'POST':
         text = request.form.get('text', '')
         if text:
-            # URLエンコードなどはブラウザが処理しますが、明示的なら urllib.parse.quote が必要
-            img_url = '/image?text=' + text
+            # 画像URLを作成
+            img_url = f'/image?text={quote(text)}'
+            
+    # ★変更点: templates/index.html を読み込みます
     return render_template('index.html', img_url=img_url, text=text)
 
 @app.route('/image')
 def image():
     text = request.args.get('text', 'No Text')
     
-    # 画像作成
-    img = Image.new('RGB', (IMG_SIZE, IMG_SIZE), color='white')
+    img = Image.new('RGB', (IMG_SIZE, IMG_SIZE), color=BG_COLOR)
     draw = ImageDraw.Draw(img)
+    font = get_font()
 
-    # フォント読み込み（失敗したらデフォルトへ）
-    try:
-        font = ImageFont.truetype(FONT_PATH, FONT_SIZE)
-    except IOError:
-        font = ImageFont.load_default()
-
-    # ★ここを修正しました★ (textsize -> textbbox)
-    # textbbox は (left, top, right, bottom) を返します
-    bbox = draw.textbbox((0, 0), text, font=font)
-    w = bbox[2] - bbox[0]
-    h = bbox[3] - bbox[1]
-
-    # 中央揃えの計算
-    x = (IMG_SIZE - w) // 2
-    y = (IMG_SIZE - h) // 2
-
-    # テキスト描画（日本語を使う場合、デフォルトフォントだと文字化けします）
-    # デフォルトフォントの場合、fill='black'だけだと見えないことがあるので調整
-    draw.text((x, y), text, fill='black', font=font)
+    center_x = IMG_SIZE // 2
+    center_y = IMG_SIZE // 2
+    
+    # 中央揃えで描画
+    draw.text((center_x, center_y), text, fill=TEXT_COLOR, font=font, anchor="mm")
 
     buf = BytesIO()
     img.save(buf, format='PNG')
     buf.seek(0)
+    
     return send_file(buf, mimetype='image/png')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True) # debug=Trueにするとエラーが見やすくなります
+    app.run(host="0.0.0.0", port=port, debug=True)

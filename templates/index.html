@@ -2,26 +2,19 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>文字→画像ジェネレーター</title>
-    <style>
-        body { font-family: -apple-system, 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴシック', sans-serif; background: #f5f5f5; text-align: center; padding: 40px; }
-        .box { background: #fff; border-radius: 10px; padding: 24px; max-width: 400px; margin: 0 auto; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-        input[type="text"] { width: 80%; padding: 10px; font-size: 1.2em; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 16px; }
-        button { padding: 10px 24px; font-size: 1em; border-radius: 6px; border: none; background: #333; color: #fff; cursor: pointer; }
-        img { margin-top: 24px; border: 1px solid #eee; background: #fff; }
-    </style>
+    <title>文字画像生成</title>
 </head>
 <body>
-    <div class="box">
-        <h1>文字→画像ジェネレーター</h1>
-        <form method="POST">
-            <input type="text" name="text" value="{{ text }}" placeholder="ここに文字を入力" required>
-            <br>
-            <button type="submit">画像にする</button>
-        </form>
-        {% if img_url %}
-            <img src="{{ img_url }}" alt="生成画像" width="256" height="256">
-        {% endif %}
-    </div>
+    <h1>画像生成アプリ</h1>
+    <form method="POST">
+        <input type="text" name="text" placeholder="文字を入力" value="{{ text }}">
+        <button type="submit">生成</button>
+    </form>
+
+    {% if img_url %}
+        <hr>
+        <h2>生成された画像:</h2>
+        <img src="{{ img_url }}" alt="Generated Image" style="border: 1px solid #ccc;">
+    {% endif %}
 </body>
 </html>
